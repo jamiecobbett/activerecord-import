@@ -174,7 +174,8 @@ describe "#import" do
       setup do
         Delorean.time_travel_to("5 minutes ago") do
           assert_difference "Book.count", +1 do
-            result = Book.import [:title, :author_name, :publisher], [["LDAP", "Big Bird", "Del Rey"]]
+            @input_dataset = [["LDAP", "Big Bird", "Del Rey"]]
+            result = Book.import [:title, :author_name, :publisher], @input_dataset
           end
         end
         @book = Book.last
@@ -194,6 +195,10 @@ describe "#import" do
   
       it "should set the updated_on column for new records" do
         assert_equal 5.minutes.ago.strftime("%H:%M"), @book.updated_on.strftime("%H:%M")
+      end
+      
+      it "should not alter the input dataset" do
+        assert_equal [["LDAP", "Big Bird", "Del Rey"]], @input_dataset
       end
     end
     
